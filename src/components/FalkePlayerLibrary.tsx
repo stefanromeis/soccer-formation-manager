@@ -143,7 +143,7 @@ const FalkePlayerLibrary: React.FC = () => {
           <div
             key={imageName}
             onClick={() => handleAddPlayer(imageName)}
-            className="group relative bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md hover:border-blue-300 cursor-pointer transition-all duration-200"
+            className="group relative bg-white rounded-lg p-3 hover:shadow-md hover:border-blue-300 cursor-pointer transition-all duration-200"
           >
             <div className="flex flex-col items-center space-y-2">
               <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">

@@ -51,6 +51,10 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     const isSelected = selectedPlayer?.id === player.id;
     const [image] = useImage(player.photo ? getImageUrl(player.photo) : '');
 
+    // 1080x1350 ratio (4:5) scaled down
+    const cardWidth = 90; // Base width (doubled)
+    const cardHeight = 112; // Height maintaining 4:5 ratio (90 * 1.25)
+
     return (
       <Group
         x={x}
@@ -59,51 +63,63 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
         onClick={() => selectPlayer(player)}
         onDragEnd={(e) => handlePlayerDragEnd(player, e)}
       >
-        {/* Player avatar background circle */}
-        <Circle
-          radius={38}
+        {/* Player avatar background rectangle */}
+        <Rect
+          x={-cardWidth/2}
+          y={-cardHeight/2}
+          width={cardWidth}
+          height={cardHeight}
           fill={isSelected ? '#fbbf24' : '#ffffff'}
           stroke={isSelected ? '#f59e0b' : '#1d4ed8'}
           strokeWidth={3}
+          cornerRadius={6}
         />
         
-        {/* Player image or fallback circle */}
+        {/* Player image or fallback rectangle */}
         {image && player.photo ? (
           <Group>
-            {/* Circular mask for the image */}
-            <Circle
-              radius={36}
+            {/* Rectangular mask for the image */}
+            <Rect
+              x={-cardWidth/2 + 3}
+              y={-cardHeight/2 + 3}
+              width={cardWidth - 6}
+              height={cardHeight - 6}
               fill="white"
               stroke={isSelected ? '#f59e0b' : '#1d4ed8'}
               strokeWidth={2}
+              cornerRadius={4}
             />
             <KonvaImage
               image={image}
-              x={-36}
-              y={-36}
-              width={72}
-              height={72}
+              x={-cardWidth/2 + 3}
+              y={-cardHeight/2 + 3}
+              width={cardWidth - 6}
+              height={cardHeight - 6}
               globalCompositeOperation="source-atop"
             />
           </Group>
         ) : (
           <>
-            <Circle
-              radius={36}
+            <Rect
+              x={-cardWidth/2 + 3}
+              y={-cardHeight/2 + 3}
+              width={cardWidth - 6}
+              height={cardHeight - 6}
               fill={isSelected ? '#fbbf24' : '#3b82f6'}
               stroke={isSelected ? '#f59e0b' : '#1d4ed8'}
               strokeWidth={2}
+              cornerRadius={4}
             />
             {/* Player number for fallback */}
             <Text
               text={player.number.toString()}
-              fontSize={20}
+              fontSize={18}
               fontFamily="Arial"
               fill="white"
               fontStyle="bold"
-              x={-10}
+              x={-cardWidth/2}
               y={-10}
-              width={20}
+              width={cardWidth}
               align="center"
             />
           </>
@@ -116,21 +132,9 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
           fontFamily="Arial"
           fill="#1f2937"
           fontStyle="bold"
-          x={-40}
-          y={44}
-          width={80}
-          align="center"
-        />
-        
-        {/* Position */}
-        <Text
-          text={player.position}
-          fontSize={10}
-          fontFamily="Arial"
-          fill="#6b7280"
-          x={-20}
-          y={58}
-          width={40}
+          x={-cardWidth}
+          y={cardHeight/2 + 5}
+          width={cardWidth * 2}
           align="center"
         />
       </Group>

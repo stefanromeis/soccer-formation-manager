@@ -53,9 +53,9 @@ function App() {
 
   const tabs = [
     { id: 'presets', label: 'Aufstellungen', icon: '⚽' },
-    { id: 'players', label: 'Spieler', icon: '👥' },
-    { id: 'dfb', label: 'DFB Suche', icon: '🔍' },
     { id: 'falke', label: 'Falke', icon: '🦅' },
+    { id: 'players', label: 'Spieler', icon: '�' },
+    { id: 'dfb', label: 'DFB Suche', icon: '🔍' },
   ];
 
   return (
