@@ -11,6 +11,7 @@ interface FormationState {
   addPlayer: (player: Omit<Player, 'id'>) => void;
   updatePlayer: (id: string, updates: Partial<Player>) => void;
   removePlayer: (id: string) => void;
+  replacePlayer: (oldPlayerId: string, newPlayer: Omit<Player, 'id'>) => void;
   selectPlayer: (player: Player | null) => void;
   movePlayer: (id: string, x: number, y: number) => void;
   loadFormation: (formation: Formation | Player[]) => void;
@@ -133,6 +134,27 @@ export const useFormationStore = create<FormationState>((set, get) => ({
       players: state.players.filter((player) => player.id !== id),
       selectedPlayer: state.selectedPlayer?.id === id ? null : state.selectedPlayer,
     }));
+  },
+
+  replacePlayer: (oldPlayerId, newPlayer) => {
+    set((state) => {
+      const oldPlayer = state.players.find(p => p.id === oldPlayerId);
+      if (!oldPlayer) return state;
+      
+      const replacementPlayer: Player = {
+        ...newPlayer,
+        id: `player-${Date.now()}`,
+        x: oldPlayer.x, // Keep the same position
+        y: oldPlayer.y,
+      };
+      
+      return {
+        players: state.players.map((player) =>
+          player.id === oldPlayerId ? replacementPlayer : player
+        ),
+        selectedPlayer: state.selectedPlayer?.id === oldPlayerId ? replacementPlayer : state.selectedPlayer,
+      };
+    });
   },
 
   selectPlayer: (player) => {

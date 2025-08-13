@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Stage, Layer, Rect, Line, Circle, Text, Group, Image as KonvaImage } from 'react-konva';
 import useImage from 'use-image';
 import { useFormationStore } from '../stores/formationStore';
@@ -11,7 +11,28 @@ interface SoccerFieldProps {
 
 const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   const stageRef = useRef<any>(null);
-  const { players, movePlayer, selectPlayer, selectedPlayer } = useFormationStore();
+  const { players, movePlayer, selectPlayer, selectedPlayer, replacePlayer } = useFormationStore();
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    player: Player | null;
+  }>({ visible: false, x: 0, y: 0, player: null });
+
+  // Available Falke players for replacement
+  const availableFalkePlayersImages = [
+    'Anton.png', 'Danny.png', 'Dennis.png', 'Devin.png', 'Eli.png', 'Eric.png',
+    'Flo.png', 'Fuchsi.png', 'Hübi.png', 'Jacob.png', 'Jannes.png', 'Jens.png',
+    'Lars.png', 'Lemmi.png', 'Leo.png', 'Leon.png', 'Lucas.png', 'Marc.png',
+    'Marcel.png', 'Micha.png', 'Mika.png', 'Rogg.png', 'Röse.png', 'Stefan.png', 'Theke.png',
+  ];
+
+  const playerNumbers: { [key: string]: number } = {
+    'Anton': 1, 'Danny': 2, 'Dennis': 3, 'Devin': 4, 'Eli': 5, 'Eric': 6,
+    'Flo': 7, 'Fuchsi': 8, 'Hübi': 9, 'Jacob': 10, 'Jannes': 11, 'Jens': 12,
+    'Lars': 13, 'Lemmi': 14, 'Leo': 15, 'Leon': 16, 'Lucas': 17, 'Marc': 18,
+    'Marcel': 19, 'Micha': 20, 'Mika': 21, 'Rogg': 22, 'Röse': 23, 'Stefan': 24, 'Theke': 25,
+  };
 
   const fieldColor = '#4ade80';
   const lineColor = '#ffffff';
@@ -32,6 +53,58 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   // Convert pixel coordinates to percentage coordinates
   const toPercentage = (pixels: number, dimension: 'width' | 'height') => {
     return (pixels / (dimension === 'width' ? width : height)) * 100;
+  };
+
+  const getPlayerNameFromImage = (imageName: string) => {
+    return imageName.replace('.png', '');
+  };
+
+  const getPlayerNumberFromImage = (imageName: string) => {
+    const playerName = getPlayerNameFromImage(imageName);
+    return playerNumbers[playerName] || Math.floor(Math.random() * 99) + 1;
+  };
+
+  // Get available players not currently on the field
+  const getAvailablePlayers = () => {
+    const usedPlayerNames = players.map(p => p.name.toLowerCase());
+    return availableFalkePlayersImages.filter(imageName => {
+      const playerName = getPlayerNameFromImage(imageName).toLowerCase();
+      return !usedPlayerNames.includes(playerName);
+    });
+  };
+
+  const handlePlayerRightClick = (player: Player, e: any) => {
+    e.evt.preventDefault();
+    const stage = e.target.getStage();
+    const pointerPosition = stage.getPointerPosition();
+    
+    setContextMenu({
+      visible: true,
+      x: pointerPosition.x,
+      y: pointerPosition.y,
+      player: player,
+    });
+  };
+
+  const handleReplacePlayer = (newPlayerImage: string) => {
+    if (contextMenu.player) {
+      const newPlayerName = getPlayerNameFromImage(newPlayerImage);
+      const newPlayerNumber = getPlayerNumberFromImage(newPlayerImage);
+      
+      replacePlayer(contextMenu.player.id, {
+        name: newPlayerName,
+        position: contextMenu.player.position,
+        number: newPlayerNumber,
+        photo: newPlayerImage,
+        x: contextMenu.player.x,
+        y: contextMenu.player.y,
+      });
+    }
+    setContextMenu({ visible: false, x: 0, y: 0, player: null });
+  };
+
+  const handleStageClick = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, player: null });
   };
 
   const handlePlayerDragEnd = (player: Player, e: any) => {
@@ -61,6 +134,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
         y={y}
         draggable
         onClick={() => selectPlayer(player)}
+        onContextMenu={(e) => handlePlayerRightClick(player, e)}
         onDragEnd={(e) => handlePlayerDragEnd(player, e)}
       >
         {/* Player avatar background rectangle */}
@@ -142,8 +216,8 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   };
 
   return (
-    <div className="soccer-field-container">
-      <Stage width={width} height={height} ref={stageRef}>
+    <div className="soccer-field-container" style={{ position: 'relative' }}>
+      <Stage width={width} height={height} ref={stageRef} onClick={handleStageClick}>
         <Layer>
           {/* Field background */}
           <Rect
@@ -292,6 +366,49 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
           ))}
         </Layer>
       </Stage>
+
+      {/* Context Menu for Player Replacement */}
+      {contextMenu.visible && (
+        <div
+          className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+        >
+          <div className="text-sm font-medium text-gray-700 mb-2 px-2 py-1">
+            Spieler ersetzen:
+          </div>
+          <div className="space-y-1">
+            {getAvailablePlayers().map((imageName) => (
+              <button
+                key={imageName}
+                onClick={() => handleReplacePlayer(imageName)}
+                className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-md transition-colors"
+              >
+                <img
+                  src={getImageUrl(imageName)}
+                  alt={getPlayerNameFromImage(imageName)}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900">
+                    {getPlayerNameFromImage(imageName)}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    #{getPlayerNumberFromImage(imageName)}
+                  </div>
+                </div>
+              </button>
+            ))}
+            {getAvailablePlayers().length === 0 && (
+              <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                Keine verfügbaren Spieler
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
