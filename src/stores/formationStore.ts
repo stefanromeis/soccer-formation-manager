@@ -13,7 +13,7 @@ interface FormationState {
   removePlayer: (id: string) => void;
   selectPlayer: (player: Player | null) => void;
   movePlayer: (id: string, x: number, y: number) => void;
-  loadFormation: (formation: Formation) => void;
+  loadFormation: (formation: Formation | Player[]) => void;
   saveFormation: (name: string, description: string) => void;
   setFormationPreset: (preset: FormationPreset) => void;
 }
@@ -147,11 +147,21 @@ export const useFormationStore = create<FormationState>((set, get) => ({
     }));
   },
 
-  loadFormation: (formation) => {
-    set({
-      currentFormation: formation,
-      players: formation.players,
-    });
+  loadFormation: (formation: Formation | Player[]) => {
+    if (Array.isArray(formation)) {
+      // If it's an array of players, load them directly
+      set({
+        players: formation,
+        selectedPlayer: null,
+      });
+    } else {
+      // If it's a Formation object, load it as before
+      set({
+        currentFormation: formation,
+        players: formation.players,
+        selectedPlayer: null,
+      });
+    }
   },
 
   saveFormation: (name, description) => {

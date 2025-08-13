@@ -47,8 +47,50 @@ function App() {
   };
 
   const handleExportFormation = () => {
-    // In a real app, this would export as PNG/PDF
-    alert('Export-Funktion würde die Aufstellung als Bild oder PDF speichern');
+    const { players } = useFormationStore.getState();
+    const formationData = {
+      name: 'Meine Aufstellung',
+      timestamp: new Date().toISOString(),
+      players: players
+    };
+    
+    const dataStr = JSON.stringify(formationData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `formation-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleImportFormation = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const formationData = JSON.parse(e.target?.result as string);
+            if (formationData.players && Array.isArray(formationData.players)) {
+              const { loadFormation } = useFormationStore.getState();
+              loadFormation(formationData.players);
+              alert(`Aufstellung "${formationData.name || 'Unbenannt'}" erfolgreich geladen!`);
+            } else {
+              alert('Ungültige Aufstellungsdatei!');
+            }
+          } catch (error) {
+            alert('Fehler beim Laden der Aufstellung!');
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
   };
 
   const tabs = [
@@ -88,7 +130,14 @@ function App() {
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download size={16} className="mr-2" />
-              Exportieren
+              Als Datei speichern
+            </button>
+            <button
+              onClick={handleImportFormation}
+              className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              <span className="mr-2">📂</span>
+              Datei laden
             </button>
           </div>
         </div>
@@ -149,7 +198,7 @@ function App() {
                 <li>• Fügen Sie benutzerdefinierte Spieler hinzu oder durchsuchen Sie die DFB-Datenbank</li>
                 <li>• Verwenden Sie den Falke-Tab, um Teamspieler mit ihren Fotos hinzuzufügen</li>
                 <li>• Klicken Sie auf Spieler, um sie auszuwählen und ihre Details zu bearbeiten</li>
-                <li>• Speichern Sie Ihre Aufstellungen für die spätere Verwendung</li>
+                <li>• Speichern Sie Ihre Aufstellungen lokal oder laden Sie sie als JSON-Datei</li>
               </ul>
             </div>
           </div>
