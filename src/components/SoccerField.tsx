@@ -19,9 +19,8 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
 
   // Get the base URL for proper asset loading in production
   const getImageUrl = (imageName: string) => {
-    const baseUrl = window.location.pathname.includes('/soccer-formation-manager') 
-      ? '/soccer-formation-manager/' 
-      : '/';
+    // Simply use the configured base URL from Vite
+    const baseUrl = import.meta.env.BASE_URL || '/';
     return `${baseUrl}${imageName}`;
   };
 
