@@ -18,7 +18,6 @@ const PlayerManagement: React.FC = () => {
   const [newPlayerData, setNewPlayerData] = useState({
     name: '',
     position: 'MF',
-    number: 1,
     x: 50,
     y: 50,
   });
@@ -31,7 +30,6 @@ const PlayerManagement: React.FC = () => {
       setNewPlayerData({
         name: '',
         position: 'MF',
-        number: players.length + 2,
         x: 50,
         y: 50,
       });
@@ -44,7 +42,6 @@ const PlayerManagement: React.FC = () => {
     setNewPlayerData({
       name: player.name,
       position: player.position,
-      number: player.number,
       x: player.x,
       y: player.y,
     });
@@ -57,7 +54,6 @@ const PlayerManagement: React.FC = () => {
       setNewPlayerData({
         name: '',
         position: 'MF',
-        number: players.length + 1,
         x: 50,
         y: 50,
       });
@@ -70,7 +66,6 @@ const PlayerManagement: React.FC = () => {
     setNewPlayerData({
       name: '',
       position: 'MF',
-      number: players.length + 1,
       x: 50,
       y: 50,
     });
@@ -125,20 +120,6 @@ const PlayerManagement: React.FC = () => {
                   ))}
                 </select>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nummer
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="99"
-                  value={newPlayerData.number}
-                  onChange={(e) => setNewPlayerData({ ...newPlayerData, number: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
             </div>
             
             <div className="flex gap-2">
@@ -181,7 +162,7 @@ const PlayerManagement: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                    {player.number}
+                    <User size={16} />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{player.name}</p>

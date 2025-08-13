@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, Save, Download } from 'lucide-react';
+import { Menu, Download } from 'lucide-react';
 import SoccerField from './components/SoccerField';
 import FormationPresets from './components/FormationPresets';
 import PlayerManagement from './components/PlayerManagement';
@@ -11,18 +11,18 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('presets');
   const [fieldDimensions, setFieldDimensions] = useState({ width: 800, height: 600 });
-  const { saveFormation } = useFormationStore();
 
   // Responsive field sizing
   useEffect(() => {
     const updateFieldSize = () => {
-      const sidebar = sidebarOpen ? 320 : 0;
-      const availableWidth = window.innerWidth - sidebar - 40; // 40px for padding
-      const availableHeight = window.innerHeight - 120; // 120px for header and padding
+      const isMobile = window.innerWidth < 768;
+      const sidebar = sidebarOpen && !isMobile ? 400 : 0; // Hide sidebar on mobile when closed
+      const availableWidth = window.innerWidth - sidebar - (isMobile ? 20 : 40); // Less padding on mobile
+      const availableHeight = window.innerHeight - (isMobile ? 80 : 120); // Less height reserved on mobile
       
       // Maintain aspect ratio (4:3)
       const aspectRatio = 4 / 3;
-      let width = Math.min(availableWidth, 1000);
+      let width = Math.min(availableWidth, isMobile ? 400 : 1000);
       let height = width / aspectRatio;
       
       if (height > availableHeight) {
@@ -30,21 +30,16 @@ function App() {
         width = height * aspectRatio;
       }
       
-      setFieldDimensions({ width: Math.max(400, width), height: Math.max(300, height) });
+      setFieldDimensions({ 
+        width: Math.max(isMobile ? 300 : 400, width), 
+        height: Math.max(isMobile ? 225 : 300, height) 
+      });
     };
 
     updateFieldSize();
     window.addEventListener('resize', updateFieldSize);
     return () => window.removeEventListener('resize', updateFieldSize);
   }, [sidebarOpen]);
-
-  const handleSaveFormation = () => {
-    const formationName = prompt('Aufstellungsname eingeben:');
-    if (formationName) {
-      saveFormation(formationName, 'Benutzerdefinierte Aufstellung');
-      alert('Aufstellung erfolgreich gespeichert!');
-    }
-  };
 
   const handleExportFormation = () => {
     const { players } = useFormationStore.getState();
@@ -104,70 +99,72 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between px-3 md:px-6 py-3 md:py-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <Menu size={24} />
+              <Menu size={20} className="md:hidden" />
+              <Menu size={24} className="hidden md:block" />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">
-              ⚽ Fußball Aufstellungs-Manager
+            <h1 className="text-lg md:text-2xl font-bold text-gray-900">
+              <span className="hidden sm:inline">⚽ Fußball Aufstellungs-Manager</span>
+              <span className="sm:hidden">⚽ Formation</span>
             </h1>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleSaveFormation}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Save size={16} className="mr-2" />
-              Aufstellung speichern
-            </button>
+          <div className="flex items-center space-x-1 md:space-x-2">
             <button
               onClick={handleExportFormation}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center px-2 md:px-4 py-1 md:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base"
             >
-              <Download size={16} className="mr-2" />
-              Als Datei speichern
+              <Download size={14} className="mr-1 md:mr-2 md:hidden" />
+              <Download size={16} className="mr-2 hidden md:block" />
+              <span className="hidden sm:inline">Als Datei speichern</span>
+              <span className="sm:hidden">Speichern</span>
             </button>
             <button
               onClick={handleImportFormation}
-              className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="flex items-center px-2 md:px-4 py-1 md:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm md:text-base"
             >
-              <span className="mr-2">📂</span>
-              Datei laden
+              <span className="mr-1 md:mr-2 text-sm">📂</span>
+              <span className="hidden sm:inline">Datei laden</span>
+              <span className="sm:hidden">Laden</span>
             </button>
           </div>
         </div>
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
+        {/* Left Sidebar Navigation */}
         {sidebarOpen && (
-          <aside className="w-80 bg-white shadow-sm border-r min-h-screen">
-            <div className="p-4">
-              {/* Tab Navigation */}
-              <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1 overflow-scroll">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <span className="mr-2">{tab.icon}</span>
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+          <nav className="w-12 md:w-16 bg-white shadow-sm border-r min-h-screen flex flex-col">
+            <div className="flex flex-col space-y-1 md:space-y-2 p-1 md:p-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-lg text-sm md:text-lg font-medium transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                  title={tab.label}
+                >
+                  {tab.icon}
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
 
+        {/* Main Content Sidebar */}
+        {sidebarOpen && (
+          <aside className="w-72 md:w-80 bg-white shadow-sm border-r min-h-screen">
+            <div className="p-2 md:p-4">
               {/* Tab Content */}
-              <div className="h-[calc(100vh-180px)] overflow-y-auto">
+              <div className="h-[calc(100vh-100px)] overflow-y-auto">
                 {activeTab === 'presets' && <FormationPresets />}
                 {activeTab === 'players' && <PlayerManagement />}
                 {activeTab === 'dfb' && <DFBPlayerSearch />}

@@ -9,32 +9,49 @@ interface SoccerFieldProps {
   height: number;
 }
 
+// Falke Logo component
+const FalkeLogo: React.FC<{ width: number; height: number }> = ({ width, height }) => {
+  const [logoImage] = useImage(`${import.meta.env.BASE_URL || '/'}falke-logo.png`);
+  
+  if (!logoImage) return null;
+  
+  // Use the same size as the removed center circle (diameter = width * 0.2)
+  const logoSize = width * 0.2;
+  
+  return (
+    <KonvaImage
+      image={logoImage}
+      x={width / 2 - logoSize / 2}
+      y={height / 2 - logoSize / 2}
+      width={logoSize}
+      height={logoSize}
+      opacity={0.4} // Slightly more visible since it's replacing the circle
+    />
+  );
+};
+
 const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   const stageRef = useRef<any>(null);
-  const { players, movePlayer, selectPlayer, selectedPlayer, replacePlayer } = useFormationStore();
+  const { players, movePlayer, selectPlayer, selectedPlayer, replacePlayer, addPlayer } = useFormationStore();
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
     y: number;
     player: Player | null;
-  }>({ visible: false, x: 0, y: 0, player: null });
+    type: 'replace' | 'place';
+    fieldPosition?: { x: number; y: number };
+  }>({ visible: false, x: 0, y: 0, player: null, type: 'replace' });
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Available Falke players for replacement
   const availableFalkePlayersImages = [
     'Anton.png', 'Danny.png', 'Dennis.png', 'Devin.png', 'Eli.png', 'Eric.png',
-    'Flo.png', 'Fuchsi.png', 'Hübi.png', 'Jacob.png', 'Jannes.png', 'Jens.png',
+    'Flo.png', 'Fuchsi.png', 'Max.png', 'Jacob.png', 'Jannes.png', 'Jens.png',
     'Lars.png', 'Lemmi.png', 'Leo.png', 'Leon.png', 'Lucas.png', 'Marc.png',
-    'Marcel.png', 'Micha.png', 'Mika.png', 'Rogg.png', 'Röse.png', 'Stefan.png', 'Theke.png',
+    'Marcel.png', 'Micha.png', 'Mika.png', 'Rogg.png', 'Lukas.png', 'Stefan.png', 'Theke.png',
   ];
 
-  const playerNumbers: { [key: string]: number } = {
-    'Anton': 1, 'Danny': 2, 'Dennis': 3, 'Devin': 4, 'Eli': 5, 'Eric': 6,
-    'Flo': 7, 'Fuchsi': 8, 'Hübi': 9, 'Jacob': 10, 'Jannes': 11, 'Jens': 12,
-    'Lars': 13, 'Lemmi': 14, 'Leo': 15, 'Leon': 16, 'Lucas': 17, 'Marc': 18,
-    'Marcel': 19, 'Micha': 20, 'Mika': 21, 'Rogg': 22, 'Röse': 23, 'Stefan': 24, 'Theke': 25,
-  };
-
-  const fieldColor = '#4ade80';
+  const fieldColor = '#16a34a'; // Darker green (green-600)
   const lineColor = '#ffffff';
   const lineWidth = 2;
 
@@ -59,17 +76,19 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     return imageName.replace('.png', '');
   };
 
-  const getPlayerNumberFromImage = (imageName: string) => {
-    const playerName = getPlayerNameFromImage(imageName);
-    return playerNumbers[playerName] || Math.floor(Math.random() * 99) + 1;
-  };
-
   // Get available players not currently on the field
-  const getAvailablePlayers = () => {
+  const getAvailablePlayers = (searchFilter: string = '') => {
     const usedPlayerNames = players.map(p => p.name.toLowerCase());
     return availableFalkePlayersImages.filter(imageName => {
       const playerName = getPlayerNameFromImage(imageName).toLowerCase();
-      return !usedPlayerNames.includes(playerName);
+      const matchesSearch = searchFilter === '' || playerName.includes(searchFilter.toLowerCase());
+      
+      // For placement mode, show all players; for replacement mode, only show unused players
+      if (contextMenu.type === 'place') {
+        return matchesSearch;
+      } else {
+        return !usedPlayerNames.includes(playerName) && matchesSearch;
+      }
     });
   };
 
@@ -78,33 +97,68 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     const stage = e.target.getStage();
     const pointerPosition = stage.getPointerPosition();
     
+    setSearchTerm(''); // Reset search when opening context menu
     setContextMenu({
       visible: true,
       x: pointerPosition.x,
       y: pointerPosition.y,
       player: player,
+      type: 'replace',
     });
   };
 
   const handleReplacePlayer = (newPlayerImage: string) => {
     if (contextMenu.player) {
       const newPlayerName = getPlayerNameFromImage(newPlayerImage);
-      const newPlayerNumber = getPlayerNumberFromImage(newPlayerImage);
       
       replacePlayer(contextMenu.player.id, {
         name: newPlayerName,
         position: contextMenu.player.position,
-        number: newPlayerNumber,
         photo: newPlayerImage,
         x: contextMenu.player.x,
         y: contextMenu.player.y,
       });
     }
-    setContextMenu({ visible: false, x: 0, y: 0, player: null });
+    setContextMenu({ visible: false, x: 0, y: 0, player: null, type: 'replace' });
   };
 
   const handleStageClick = () => {
-    setContextMenu({ visible: false, x: 0, y: 0, player: null });
+    setContextMenu({ visible: false, x: 0, y: 0, player: null, type: 'replace' });
+  };
+
+  const handleFieldRightClick = (e: any) => {
+    e.evt.preventDefault();
+    const stage = e.target.getStage();
+    const pointerPosition = stage.getPointerPosition();
+    
+    // Convert screen coordinates to field percentage coordinates
+    const fieldX = toPercentage(pointerPosition.x, 'width');
+    const fieldY = toPercentage(pointerPosition.y, 'height');
+    
+    setSearchTerm(''); // Reset search when opening context menu
+    setContextMenu({
+      visible: true,
+      x: pointerPosition.x,
+      y: pointerPosition.y,
+      player: null,
+      type: 'place',
+      fieldPosition: { x: fieldX, y: fieldY },
+    });
+  };
+
+  const handlePlacePlayer = (playerImage: string) => {
+    if (contextMenu.fieldPosition) {
+      const playerName = getPlayerNameFromImage(playerImage);
+      
+      addPlayer({
+        name: playerName,
+        position: 'FIELD',
+        photo: playerImage,
+        x: contextMenu.fieldPosition.x,
+        y: contextMenu.fieldPosition.y,
+      });
+    }
+    setContextMenu({ visible: false, x: 0, y: 0, player: null, type: 'replace' });
   };
 
   const handlePlayerDragEnd = (player: Player, e: any) => {
@@ -124,9 +178,11 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     const isSelected = selectedPlayer?.id === player.id;
     const [image] = useImage(player.photo ? getImageUrl(player.photo) : '');
 
-    // 1080x1350 ratio (4:5) scaled down
-    const cardWidth = 90; // Base width (doubled)
-    const cardHeight = 112; // Height maintaining 4:5 ratio (90 * 1.25)
+    // 1080x1350 ratio (4:5) scaled down - responsive sizing
+    const isMobile = width < 600; // Simple mobile detection based on field width
+    const baseWidth = isMobile ? 45 : 90; // Half size on mobile
+    const cardWidth = baseWidth;
+    const cardHeight = baseWidth * 1.25; // Maintain 4:5 ratio
 
     return (
       <Group
@@ -184,27 +240,15 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
               strokeWidth={2}
               cornerRadius={4}
             />
-            {/* Player number for fallback */}
-            <Text
-              text={player.number.toString()}
-              fontSize={18}
-              fontFamily="Arial"
-              fill="white"
-              fontStyle="bold"
-              x={-cardWidth/2}
-              y={-10}
-              width={cardWidth}
-              align="center"
-            />
           </>
         )}
         
         {/* Player name */}
         <Text
           text={player.name}
-          fontSize={12}
+          fontSize={isMobile ? 8 : 12}
           fontFamily="Arial"
-          fill="#1f2937"
+          fill="white"
           fontStyle="bold"
           x={-cardWidth}
           y={cardHeight/2 + 5}
@@ -217,7 +261,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
 
   return (
     <div className="soccer-field-container" style={{ position: 'relative' }}>
-      <Stage width={width} height={height} ref={stageRef} onClick={handleStageClick}>
+      <Stage width={width} height={height} ref={stageRef} onClick={handleStageClick} onContextMenu={handleFieldRightClick}>
         <Layer>
           {/* Field background */}
           <Rect
@@ -246,16 +290,6 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
             strokeWidth={lineWidth}
           />
           
-          {/* Center circle */}
-          <Circle
-            x={width / 2}
-            y={height / 2}
-            radius={width * 0.1}
-            stroke={lineColor}
-            strokeWidth={lineWidth}
-            fill="transparent"
-          />
-          
           {/* Center spot */}
           <Circle
             x={width / 2}
@@ -263,6 +297,9 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
             radius={3}
             fill={lineColor}
           />
+          
+          {/* Falke Logo in center */}
+          <FalkeLogo width={width} height={height} />
           
           {/* Penalty areas */}
           {/* Top penalty area */}
@@ -370,20 +407,33 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
       {/* Context Menu for Player Replacement */}
       {contextMenu.visible && (
         <div
-          className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-y-auto"
+          className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-hidden"
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
           }}
         >
           <div className="text-sm font-medium text-gray-700 mb-2 px-2 py-1">
-            Spieler ersetzen:
+            {contextMenu.type === 'replace' ? 'Spieler ersetzen:' : 'Spieler platzieren:'}
           </div>
-          <div className="space-y-1">
-            {getAvailablePlayers().map((imageName) => (
+          
+          {/* Search Field */}
+          <div className="px-2 mb-2">
+            <input
+              type="text"
+              placeholder="Spieler suchen..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              autoFocus
+            />
+          </div>
+          
+          <div className="max-h-40 overflow-y-auto space-y-1">
+            {getAvailablePlayers(searchTerm).map((imageName) => (
               <button
                 key={imageName}
-                onClick={() => handleReplacePlayer(imageName)}
+                onClick={() => contextMenu.type === 'replace' ? handleReplacePlayer(imageName) : handlePlacePlayer(imageName)}
                 className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-md transition-colors"
               >
                 <img
@@ -395,15 +445,12 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
                   <div className="text-sm font-medium text-gray-900">
                     {getPlayerNameFromImage(imageName)}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    #{getPlayerNumberFromImage(imageName)}
-                  </div>
                 </div>
               </button>
             ))}
-            {getAvailablePlayers().length === 0 && (
+            {getAvailablePlayers(searchTerm).length === 0 && (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                Keine verfügbaren Spieler
+                {searchTerm ? 'Keine Spieler gefunden' : 'Keine verfügbaren Spieler'}
               </div>
             )}
           </div>

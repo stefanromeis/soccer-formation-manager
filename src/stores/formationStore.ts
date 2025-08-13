@@ -21,20 +21,42 @@ interface FormationState {
 
 const defaultFormationPresets: FormationPreset[] = [
   {
+    name: '4-2-3-1',
+    formation: '4-2-3-1',
+    positions: [
+      // Goalkeeper
+      { x: 50, y: 90, position: 'TW' },
+      // Defense
+      { x: 15, y: 75, position: 'LV' },
+      { x: 35, y: 75, position: 'IV' },
+      { x: 65, y: 75, position: 'IV' },
+      { x: 85, y: 75, position: 'RV' },
+      // Defensive Midfield
+      { x: 35, y: 60, position: 'ZDM' },
+      { x: 65, y: 60, position: 'ZDM' },
+      // Attacking Midfield
+      { x: 20, y: 40, position: 'LM' },
+      { x: 50, y: 45, position: 'ZOM' },
+      { x: 80, y: 40, position: 'RM' },
+      // Attack
+      { x: 50, y: 20, position: 'ST' },
+    ],
+  },
+  {
     name: '4-4-2',
     formation: '4-4-2',
     positions: [
       // Goalkeeper
-      { x: 50, y: 90, position: 'GK' },
+      { x: 50, y: 90, position: 'TW' },
       // Defense
-      { x: 15, y: 75, position: 'LB' },
-      { x: 35, y: 75, position: 'CB' },
-      { x: 65, y: 75, position: 'CB' },
-      { x: 85, y: 75, position: 'RB' },
+      { x: 15, y: 75, position: 'LV' },
+      { x: 35, y: 75, position: 'IV' },
+      { x: 65, y: 75, position: 'IV' },
+      { x: 85, y: 75, position: 'RV' },
       // Midfield
       { x: 15, y: 50, position: 'LM' },
-      { x: 35, y: 50, position: 'CM' },
-      { x: 65, y: 50, position: 'CM' },
+      { x: 35, y: 50, position: 'ZM' },
+      { x: 65, y: 50, position: 'ZM' },
       { x: 85, y: 50, position: 'RM' },
       // Attack
       { x: 35, y: 25, position: 'ST' },
@@ -46,20 +68,20 @@ const defaultFormationPresets: FormationPreset[] = [
     formation: '4-3-3',
     positions: [
       // Goalkeeper
-      { x: 50, y: 90, position: 'GK' },
+      { x: 50, y: 90, position: 'TW' },
       // Defense
-      { x: 15, y: 75, position: 'LB' },
-      { x: 35, y: 75, position: 'CB' },
-      { x: 65, y: 75, position: 'CB' },
-      { x: 85, y: 75, position: 'RB' },
+      { x: 15, y: 75, position: 'LV' },
+      { x: 35, y: 75, position: 'IV' },
+      { x: 65, y: 75, position: 'IV' },
+      { x: 85, y: 75, position: 'RV' },
       // Midfield
-      { x: 25, y: 55, position: 'CM' },
-      { x: 50, y: 55, position: 'CM' },
-      { x: 75, y: 55, position: 'CM' },
+      { x: 25, y: 55, position: 'ZM' },
+      { x: 50, y: 55, position: 'ZM' },
+      { x: 75, y: 55, position: 'ZM' },
       // Attack
-      { x: 20, y: 25, position: 'LW' },
+      { x: 20, y: 25, position: 'LF' },
       { x: 50, y: 20, position: 'ST' },
-      { x: 80, y: 25, position: 'RW' },
+      { x: 80, y: 25, position: 'RF' },
     ],
   },
   {
@@ -67,17 +89,17 @@ const defaultFormationPresets: FormationPreset[] = [
     formation: '3-5-2',
     positions: [
       // Goalkeeper
-      { x: 50, y: 90, position: 'GK' },
+      { x: 50, y: 90, position: 'TW' },
       // Defense
-      { x: 25, y: 75, position: 'CB' },
-      { x: 50, y: 75, position: 'CB' },
-      { x: 75, y: 75, position: 'CB' },
+      { x: 25, y: 75, position: 'IV' },
+      { x: 50, y: 75, position: 'IV' },
+      { x: 75, y: 75, position: 'IV' },
       // Midfield
-      { x: 10, y: 50, position: 'LWB' },
-      { x: 30, y: 55, position: 'CM' },
-      { x: 50, y: 50, position: 'CM' },
-      { x: 70, y: 55, position: 'CM' },
-      { x: 90, y: 50, position: 'RWB' },
+      { x: 10, y: 50, position: 'LWV' },
+      { x: 30, y: 55, position: 'ZM' },
+      { x: 50, y: 50, position: 'ZM' },
+      { x: 70, y: 55, position: 'ZM' },
+      { x: 90, y: 50, position: 'RWV' },
       // Attack
       { x: 40, y: 25, position: 'ST' },
       { x: 60, y: 25, position: 'ST' },
@@ -86,27 +108,7 @@ const defaultFormationPresets: FormationPreset[] = [
 ];
 
 export const useFormationStore = create<FormationState>((set, get) => ({
-  players: [
-    // Add some sample Falke players to start with
-    {
-      id: 'sample-stefan',
-      name: 'Stefan',
-      position: 'ST',
-      number: 24, // Using the mapped number for Stefan
-      photo: 'Stefan.png',
-      x: 50,
-      y: 30,
-    },
-    {
-      id: 'sample-flo',
-      name: 'Flo',
-      position: 'CM',
-      number: 7, // Using the mapped number for Flo
-      photo: 'Flo.png',
-      x: 40,
-      y: 50,
-    },
-  ],
+  players: [],
   currentFormation: null,
   selectedPlayer: null,
   formationPresets: defaultFormationPresets,
@@ -203,7 +205,6 @@ export const useFormationStore = create<FormationState>((set, get) => ({
       id: `player-${Date.now()}-${index}`,
       name: `Player ${index + 1}`,
       position: pos.position,
-      number: index + 1,
       x: pos.x,
       y: pos.y,
     }));

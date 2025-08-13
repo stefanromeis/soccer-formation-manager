@@ -22,7 +22,7 @@ const FalkePlayerLibrary: React.FC = () => {
     'Eric.png',
     'Flo.png',
     'Fuchsi.png',
-    'Hübi.png',
+    'Max.png',
     'Jacob.png',
     'Jannes.png',
     'Jens.png',
@@ -36,39 +36,10 @@ const FalkePlayerLibrary: React.FC = () => {
     'Micha.png',
     'Mika.png',
     'Rogg.png',
-    'Röse.png',
+    'Lukas.png',
     'Stefan.png',
     'Theke.png',
   ];
-
-  // Player number mapping based on names
-  const playerNumbers: { [key: string]: number } = {
-    'Anton': 1,
-    'Danny': 2,
-    'Dennis': 3,
-    'Devin': 4,
-    'Eli': 5,
-    'Eric': 6,
-    'Flo': 7,
-    'Fuchsi': 8,
-    'Hübi': 9,
-    'Jacob': 10,
-    'Jannes': 11,
-    'Jens': 12,
-    'Lars': 13,
-    'Lemmi': 14,
-    'Leo': 15,
-    'Leon': 16,
-    'Lucas': 17,
-    'Marc': 18,
-    'Marcel': 19,
-    'Micha': 20,
-    'Mika': 21,
-    'Rogg': 22,
-    'Röse': 23,
-    'Stefan': 24,
-    'Theke': 25,
-  };
 
   const positions = [
     'TW', 'IV', 'LV', 'RV', 'LWV', 'RWV', 
@@ -80,30 +51,12 @@ const FalkePlayerLibrary: React.FC = () => {
     return imageName.replace('.png', '').replace(' welcome', ' Welcome');
   };
 
-  const getPlayerNumberFromImage = (imageName: string) => {
-    const playerName = getPlayerNameFromImage(imageName);
-    
-    // First, check if there's a number in the filename
-    const numberMatch = imageName.match(/(\d+)/);
-    if (numberMatch) {
-      const extractedNumber = parseInt(numberMatch[1]);
-      if (extractedNumber > 0 && extractedNumber <= 99) {
-        return extractedNumber;
-      }
-    }
-    
-    // If no number in filename, use the predefined mapping
-    return playerNumbers[playerName] || Math.floor(Math.random() * 99) + 1;
-  };
-
   const handleAddPlayer = (imageName: string) => {
     const playerName = getPlayerNameFromImage(imageName);
-    const playerNumber = getPlayerNumberFromImage(imageName);
     
     addPlayer({
       name: playerName,
       position: selectedPosition,
-      number: playerNumber,
       photo: imageName,
       x: 50, // Center of the field
       y: 50,
@@ -163,9 +116,7 @@ const FalkePlayerLibrary: React.FC = () => {
                 <p className="text-sm font-medium text-gray-900 truncate max-w-20">
                   {getPlayerNameFromImage(imageName)}
                 </p>
-                <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
-                  <span>#{getPlayerNumberFromImage(imageName)}</span>
-                  <span>•</span>
+                <div className="flex items-center justify-center text-xs text-gray-500">
                   <span>{selectedPosition}</span>
                 </div>
               </div>

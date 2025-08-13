@@ -2,7 +2,7 @@ export interface Player {
   id: string;
   name: string;
   position: string;
-  number: number;
+  number?: number;
   photo?: string;
   x: number;
   y: number;
