@@ -1,0 +1,47 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+
+# Env files
+.env
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage
+coverage/
+
+# Misc
+*.log
+*.tmp
+
+# Local config
+*.local.js
+*.local.ts
+
+# Mac system files
+Icon?
+
+# SvelteKit/Vite
+.svelte-kit/
+
+# Optional: lock files (uncomment if not needed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
