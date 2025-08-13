@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-100 font-sans;
+  }
+}
+
+@layer components {
+  .soccer-field {
+    background: linear-gradient(to bottom, #4ade80, #22c55e);
+    position: relative;
+  }
+  
+  .field-line {
+    stroke: white;
+    stroke-width: 2;
+    fill: none;
+  }
+  
+  .player-avatar {
+    @apply w-12 h-12 rounded-full border-2 border-white shadow-lg cursor-pointer transition-all duration-200 hover:scale-110;
+  }
+  
+  .player-selected {
+    @apply border-yellow-400 ring-2 ring-yellow-400;
+  }
+  
+  .formation-preset {
+    @apply p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-blue-300;
+  }
+  
+  .formation-preset.active {
+    @apply border-blue-500 bg-blue-50;
+  }
+}
