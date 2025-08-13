@@ -5,6 +5,14 @@ const FalkePlayerLibrary: React.FC = () => {
   const { addPlayer } = useFormationStore();
   const [selectedPosition, setSelectedPosition] = useState('ST');
 
+  // Get the base URL for proper asset loading in production
+  const getImageUrl = (imageName: string) => {
+    const baseUrl = window.location.pathname.includes('/soccer-formation-manager') 
+      ? '/soccer-formation-manager/' 
+      : '/';
+    return `${baseUrl}${imageName}`;
+  };
+
     // List of available player images in the public folder
   const falkePlayersImages = [
     'Anton.png',
@@ -141,7 +149,7 @@ const FalkePlayerLibrary: React.FC = () => {
             <div className="flex flex-col items-center space-y-2">
               <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
                 <img
-                  src={`/${imageName}`}
+                  src={getImageUrl(imageName)}
                   alt={getPlayerNameFromImage(imageName)}
                   className="w-full h-full object-cover"
                   onError={(e) => {

@@ -17,6 +17,14 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   const lineColor = '#ffffff';
   const lineWidth = 2;
 
+  // Get the base URL for proper asset loading in production
+  const getImageUrl = (imageName: string) => {
+    const baseUrl = window.location.pathname.includes('/soccer-formation-manager') 
+      ? '/soccer-formation-manager/' 
+      : '/';
+    return `${baseUrl}${imageName}`;
+  };
+
   // Convert percentage coordinates to pixel coordinates
   const toPixels = (percentage: number, dimension: 'width' | 'height') => {
     return (percentage / 100) * (dimension === 'width' ? width : height);
@@ -42,7 +50,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     const x = toPixels(player.x, 'width');
     const y = toPixels(player.y, 'height');
     const isSelected = selectedPlayer?.id === player.id;
-    const [image] = useImage(player.photo ? `/${player.photo}` : '');
+    const [image] = useImage(player.photo ? getImageUrl(player.photo) : '');
 
     return (
       <Group
