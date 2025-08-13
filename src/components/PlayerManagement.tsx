@@ -23,7 +23,7 @@ const PlayerManagement: React.FC = () => {
     y: 50,
   });
 
-  const positions = ['GK', 'CB', 'LB', 'RB', 'LWB', 'RWB', 'CM', 'LM', 'RM', 'LW', 'RW', 'ST'];
+  const positions = ['TW', 'IV', 'LV', 'RV', 'LWV', 'RWV', 'ZM', 'LM', 'RM', 'LF', 'RF', 'ST'];
 
   const handleAddPlayer = () => {
     if (newPlayerData.name.trim()) {
@@ -79,13 +79,13 @@ const PlayerManagement: React.FC = () => {
   return (
     <div className="player-management">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Players</h3>
+        <h3 className="text-lg font-semibold text-gray-800">Spieler</h3>
         <button
           onClick={() => setIsAddingPlayer(true)}
           className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           <Plus size={16} className="mr-1" />
-          Add Player
+          Spieler hinzufügen
         </button>
       </div>
 
@@ -93,7 +93,7 @@ const PlayerManagement: React.FC = () => {
       {(isAddingPlayer || editingPlayer) && (
         <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
           <h4 className="font-medium mb-3">
-            {editingPlayer ? 'Edit Player' : 'Add New Player'}
+            {editingPlayer ? 'Spieler bearbeiten' : 'Neuen Spieler hinzufügen'}
           </h4>
           
           <div className="space-y-3">
@@ -106,7 +106,7 @@ const PlayerManagement: React.FC = () => {
                 value={newPlayerData.name}
                 onChange={(e) => setNewPlayerData({ ...newPlayerData, name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Player name"
+                placeholder="Spielername"
               />
             </div>
             
@@ -128,7 +128,7 @@ const PlayerManagement: React.FC = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Number
+                  Nummer
                 </label>
                 <input
                   type="number"
@@ -146,13 +146,13 @@ const PlayerManagement: React.FC = () => {
                 onClick={editingPlayer ? handleUpdatePlayer : handleAddPlayer}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
               >
-                {editingPlayer ? 'Update' : 'Add'} Player
+                {editingPlayer ? 'Aktualisieren' : 'Hinzufügen'}
               </button>
               <button
                 onClick={handleCancel}
                 className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
               >
-                Cancel
+                Abbrechen
               </button>
             </div>
           </div>
@@ -164,8 +164,8 @@ const PlayerManagement: React.FC = () => {
         {players.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <User size={48} className="mx-auto mb-2 opacity-50" />
-            <p>No players added yet</p>
-            <p className="text-sm">Click "Add Player" to get started</p>
+            <p>Noch keine Spieler hinzugefügt</p>
+            <p className="text-sm">Klicken Sie auf "Spieler hinzufügen" um zu beginnen</p>
           </div>
         ) : (
           players.map((player) => (

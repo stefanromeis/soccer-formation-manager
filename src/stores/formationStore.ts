@@ -85,7 +85,27 @@ const defaultFormationPresets: FormationPreset[] = [
 ];
 
 export const useFormationStore = create<FormationState>((set, get) => ({
-  players: [],
+  players: [
+    // Add some sample Falke players to start with
+    {
+      id: 'sample-stefan',
+      name: 'Stefan',
+      position: 'ST',
+      number: 24, // Using the mapped number for Stefan
+      photo: 'Stefan.png',
+      x: 50,
+      y: 30,
+    },
+    {
+      id: 'sample-flo',
+      name: 'Flo',
+      position: 'CM',
+      number: 7, // Using the mapped number for Flo
+      photo: 'Flo.png',
+      x: 40,
+      y: 50,
+    },
+  ],
   currentFormation: null,
   selectedPlayer: null,
   formationPresets: defaultFormationPresets,

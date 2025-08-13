@@ -75,7 +75,7 @@ const mockDFBPlayers: DFBPlayer[] = [
 const DFBPlayerSearch: React.FC = () => {
   const { addPlayer, players } = useFormationStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  // const [isSearching, setIsSearching] = useState(false);
 
   const filteredPlayers = mockDFBPlayers.filter(player =>
     `${player.firstName} ${player.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||

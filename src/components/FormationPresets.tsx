@@ -11,7 +11,7 @@ const FormationPresets: React.FC = () => {
 
   return (
     <div className="formation-presets">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">Formation Presets</h3>
+      <h3 className="text-lg font-semibold mb-4 text-gray-800">Aufstellungsvorlagen</h3>
       <div className="grid grid-cols-1 gap-3">
         {formationPresets.map((preset) => (
           <div

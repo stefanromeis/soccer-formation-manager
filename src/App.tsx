@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { Menu, Save, Download, Settings } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, Save, Download } from 'lucide-react';
 import SoccerField from './components/SoccerField';
 import FormationPresets from './components/FormationPresets';
 import PlayerManagement from './components/PlayerManagement';
 import DFBPlayerSearch from './components/DFBPlayerSearch';
+import FalkePlayerLibrary from './components/FalkePlayerLibrary';
 import { useFormationStore } from './stores/formationStore';
 
 function App() {
@@ -39,22 +39,23 @@ function App() {
   }, [sidebarOpen]);
 
   const handleSaveFormation = () => {
-    const formationName = prompt('Enter formation name:');
+    const formationName = prompt('Aufstellungsname eingeben:');
     if (formationName) {
-      saveFormation(formationName, 'Custom formation');
-      alert('Formation saved successfully!');
+      saveFormation(formationName, 'Benutzerdefinierte Aufstellung');
+      alert('Aufstellung erfolgreich gespeichert!');
     }
   };
 
   const handleExportFormation = () => {
     // In a real app, this would export as PNG/PDF
-    alert('Export functionality would save the formation as an image or PDF');
+    alert('Export-Funktion würde die Aufstellung als Bild oder PDF speichern');
   };
 
   const tabs = [
-    { id: 'presets', label: 'Formations', icon: '⚽' },
-    { id: 'players', label: 'Players', icon: '👥' },
-    { id: 'dfb', label: 'DFB Search', icon: '🔍' },
+    { id: 'presets', label: 'Aufstellungen', icon: '⚽' },
+    { id: 'players', label: 'Spieler', icon: '👥' },
+    { id: 'dfb', label: 'DFB Suche', icon: '🔍' },
+    { id: 'falke', label: 'Falke', icon: '🦅' },
   ];
 
   return (
@@ -70,7 +71,7 @@ function App() {
               <Menu size={24} />
             </button>
             <h1 className="text-2xl font-bold text-gray-900">
-              ⚽ Soccer Formation Manager
+              ⚽ Fußball Aufstellungs-Manager
             </h1>
           </div>
           
@@ -80,14 +81,14 @@ function App() {
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Save size={16} className="mr-2" />
-              Save Formation
+              Aufstellung speichern
             </button>
             <button
               onClick={handleExportFormation}
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download size={16} className="mr-2" />
-              Export
+              Exportieren
             </button>
           </div>
         </div>
@@ -99,7 +100,7 @@ function App() {
           <aside className="w-80 bg-white shadow-sm border-r min-h-screen">
             <div className="p-4">
               {/* Tab Navigation */}
-              <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
+              <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1 overflow-scroll">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -121,6 +122,7 @@ function App() {
                 {activeTab === 'presets' && <FormationPresets />}
                 {activeTab === 'players' && <PlayerManagement />}
                 {activeTab === 'dfb' && <DFBPlayerSearch />}
+                {activeTab === 'falke' && <FalkePlayerLibrary />}
               </div>
             </div>
           </aside>
@@ -140,13 +142,14 @@ function App() {
           {/* Instructions */}
           <div className="mt-6 max-w-2xl mx-auto">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
+              <h3 className="font-semibold text-blue-900 mb-2">So verwenden Sie die App:</h3>
               <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Select a formation preset from the sidebar to get started</li>
-                <li>• Drag players around the field to customize positions</li>
-                <li>• Add custom players or search the DFB database</li>
-                <li>• Click on players to select and edit their details</li>
-                <li>• Save your formations for later use</li>
+                <li>• Wählen Sie eine Aufstellungsvorlage aus der Seitenleiste zum Starten</li>
+                <li>• Ziehen Sie Spieler auf dem Feld herum, um Positionen anzupassen</li>
+                <li>• Fügen Sie benutzerdefinierte Spieler hinzu oder durchsuchen Sie die DFB-Datenbank</li>
+                <li>• Verwenden Sie den Falke-Tab, um Teamspieler mit ihren Fotos hinzuzufügen</li>
+                <li>• Klicken Sie auf Spieler, um sie auszuwählen und ihre Details zu bearbeiten</li>
+                <li>• Speichern Sie Ihre Aufstellungen für die spätere Verwendung</li>
               </ul>
             </div>
           </div>

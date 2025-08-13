@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
-import { Stage, Layer, Rect, Line, Circle, Text, Group } from 'react-konva';
+import React, { useRef } from 'react';
+import { Stage, Layer, Rect, Line, Circle, Text, Group, Image as KonvaImage } from 'react-konva';
+import useImage from 'use-image';
 import { useFormationStore } from '../stores/formationStore';
 import { Player } from '../types';
 
@@ -41,6 +42,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     const x = toPixels(player.x, 'width');
     const y = toPixels(player.y, 'height');
     const isSelected = selectedPlayer?.id === player.id;
+    const [image] = useImage(player.photo ? `/${player.photo}` : '');
 
     return (
       <Group
@@ -50,26 +52,55 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
         onClick={() => selectPlayer(player)}
         onDragEnd={(e) => handlePlayerDragEnd(player, e)}
       >
-        {/* Player circle */}
+        {/* Player avatar background circle */}
         <Circle
-          radius={20}
-          fill={isSelected ? '#fbbf24' : '#3b82f6'}
+          radius={38}
+          fill={isSelected ? '#fbbf24' : '#ffffff'}
           stroke={isSelected ? '#f59e0b' : '#1d4ed8'}
-          strokeWidth={2}
+          strokeWidth={3}
         />
         
-        {/* Player number */}
-        <Text
-          text={player.number.toString()}
-          fontSize={14}
-          fontFamily="Arial"
-          fill="white"
-          fontStyle="bold"
-          x={-7}
-          y={-7}
-          width={14}
-          align="center"
-        />
+        {/* Player image or fallback circle */}
+        {image && player.photo ? (
+          <Group>
+            {/* Circular mask for the image */}
+            <Circle
+              radius={36}
+              fill="white"
+              stroke={isSelected ? '#f59e0b' : '#1d4ed8'}
+              strokeWidth={2}
+            />
+            <KonvaImage
+              image={image}
+              x={-36}
+              y={-36}
+              width={72}
+              height={72}
+              globalCompositeOperation="source-atop"
+            />
+          </Group>
+        ) : (
+          <>
+            <Circle
+              radius={36}
+              fill={isSelected ? '#fbbf24' : '#3b82f6'}
+              stroke={isSelected ? '#f59e0b' : '#1d4ed8'}
+              strokeWidth={2}
+            />
+            {/* Player number for fallback */}
+            <Text
+              text={player.number.toString()}
+              fontSize={20}
+              fontFamily="Arial"
+              fill="white"
+              fontStyle="bold"
+              x={-10}
+              y={-10}
+              width={20}
+              align="center"
+            />
+          </>
+        )}
         
         {/* Player name */}
         <Text
@@ -77,9 +108,10 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
           fontSize={12}
           fontFamily="Arial"
           fill="#1f2937"
-          x={-30}
-          y={25}
-          width={60}
+          fontStyle="bold"
+          x={-40}
+          y={44}
+          width={80}
           align="center"
         />
         
@@ -89,9 +121,9 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
           fontSize={10}
           fontFamily="Arial"
           fill="#6b7280"
-          x={-15}
-          y={38}
-          width={30}
+          x={-20}
+          y={58}
+          width={40}
           align="center"
         />
       </Group>
