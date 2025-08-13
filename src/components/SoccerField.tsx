@@ -32,7 +32,7 @@ const FalkeLogo: React.FC<{ width: number; height: number }> = ({ width, height 
 
 const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   const stageRef = useRef<any>(null);
-  const { players, movePlayer, selectPlayer, selectedPlayer, replacePlayer, addPlayer } = useFormationStore();
+  const { players, movePlayer, selectPlayer, selectedPlayer, replacePlayer, addPlayer, removePlayer } = useFormationStore();
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
@@ -94,6 +94,9 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
 
   const handlePlayerRightClick = (player: Player, e: any) => {
     e.evt.preventDefault();
+    e.evt.stopPropagation(); // Prevent the stage handler from firing
+    e.cancelBubble = true; // Additional bubble prevention
+    
     const stage = e.target.getStage();
     const pointerPosition = stage.getPointerPosition();
     
@@ -108,16 +111,27 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
   };
 
   const handleReplacePlayer = (newPlayerImage: string) => {
-    if (contextMenu.player) {
+    const playerToReplace = contextMenu.player;
+    if (playerToReplace) {
       const newPlayerName = getPlayerNameFromImage(newPlayerImage);
       
-      replacePlayer(contextMenu.player.id, {
+      replacePlayer(playerToReplace.id, {
         name: newPlayerName,
-        position: contextMenu.player.position,
+        position: playerToReplace.position,
         photo: newPlayerImage,
-        x: contextMenu.player.x,
-        y: contextMenu.player.y,
+        x: playerToReplace.x,
+        y: playerToReplace.y,
       });
+    } else {
+      console.error('No player to replace found in context menu');
+    }
+    setContextMenu({ visible: false, x: 0, y: 0, player: null, type: 'replace' });
+  };
+
+  const handleRemovePlayer = () => {
+    const playerToRemove = contextMenu.player;
+    if (playerToRemove) {
+      removePlayer(playerToRemove.id);
     }
     setContextMenu({ visible: false, x: 0, y: 0, player: null, type: 'replace' });
   };
@@ -136,6 +150,9 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     const fieldY = toPercentage(pointerPosition.y, 'height');
     
     setSearchTerm(''); // Reset search when opening context menu
+    
+    // This handler only fires for empty space clicks (player clicks are handled separately)
+    // So we always treat this as placement
     setContextMenu({
       visible: true,
       x: pointerPosition.x,
@@ -416,6 +433,18 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
           <div className="text-sm font-medium text-gray-700 mb-2 px-2 py-1">
             {contextMenu.type === 'replace' ? 'Spieler ersetzen:' : 'Spieler platzieren:'}
           </div>
+          
+          {/* Remove Player Button (only for replacement mode) */}
+          {contextMenu.type === 'replace' && contextMenu.player && (
+            <div className="px-2 mb-2">
+              <button
+                onClick={handleRemovePlayer}
+                className="w-full flex items-center justify-center px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+              >
+                🗑️ Spieler entfernen
+              </button>
+            </div>
+          )}
           
           {/* Search Field */}
           <div className="px-2 mb-2">
