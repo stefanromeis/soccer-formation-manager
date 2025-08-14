@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormationStore } from '../stores/formationStore';
 
 const FalkePlayerLibrary: React.FC = () => {
   const { addPlayer } = useFormationStore();
-  const [selectedPosition, setSelectedPosition] = useState('ST');
 
   // Get the base URL for proper asset loading in production
   const getImageUrl = (imageName: string) => {
@@ -41,12 +40,6 @@ const FalkePlayerLibrary: React.FC = () => {
     'Theke.png',
   ];
 
-  const positions = [
-    'TW', 'IV', 'LV', 'RV', 'LWV', 'RWV', 
-    'ZM', 'LM', 'RM', 'ZOM', 'ZDM',
-    'ST', 'LF', 'RF', 'MS'
-  ];
-
   const getPlayerNameFromImage = (imageName: string) => {
     return imageName.replace('.png', '').replace(' welcome', ' Welcome');
   };
@@ -56,7 +49,7 @@ const FalkePlayerLibrary: React.FC = () => {
     
     addPlayer({
       name: playerName,
-      position: selectedPosition,
+      position: 'FIELD', // Default position
       photo: imageName,
       x: 50, // Center of the field
       y: 50,
@@ -66,23 +59,6 @@ const FalkePlayerLibrary: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Standard-Position für neue Spieler:
-        </label>
-        <select
-          value={selectedPosition}
-          onChange={(e) => setSelectedPosition(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {positions.map((position) => (
-            <option key={position} value={position}>
-              {position}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">
           🦅 Falke Spieler
         </h3>
@@ -91,7 +67,7 @@ const FalkePlayerLibrary: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+      <div className="grid grid-cols-2 gap-3 max-h-[100vh-200px] overflow-y-auto">
         {falkePlayersImages.map((imageName) => (
           <div
             key={imageName}
@@ -116,9 +92,6 @@ const FalkePlayerLibrary: React.FC = () => {
                 <p className="text-sm font-medium text-gray-900 truncate max-w-20">
                   {getPlayerNameFromImage(imageName)}
                 </p>
-                <div className="flex items-center justify-center text-xs text-gray-500">
-                  <span>{selectedPosition}</span>
-                </div>
               </div>
             </div>
             
@@ -130,13 +103,6 @@ const FalkePlayerLibrary: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <h4 className="font-medium text-blue-900 mb-1">Tipp:</h4>
-        <p className="text-sm text-blue-800">
-          Nach dem Hinzufügen eines Spielers können Sie ihn an jede Position auf dem Feld ziehen und seine Details durch Anklicken bearbeiten.
-        </p>
       </div>
     </div>
   );
