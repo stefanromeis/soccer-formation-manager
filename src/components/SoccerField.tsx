@@ -48,7 +48,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
     'Anton.png', 'Danny.png', 'Dennis.png', 'Devin.png', 'Eli.png', 'Eric.png',
     'Flo.png', 'Fuchsi.png', 'Max.png', 'Jacob.png', 'Jannes.png', 'Jens.png',
     'Lars.png', 'Lemmi.png', 'Leo.png', 'Leon.png', 'Lucas.png', 'Marc.png',
-    'Marcel.png', 'Micha.png', 'Mika.png', 'Rogg.png', 'Lukas.png', 'Stefan.png', 'Theke.png',
+    'Marcel.png', 'Micha.png', 'Mika.png', 'Niclas.png', 'Lukas.png', 'Stefan.png', 'Nicholas.png',
   ];
 
   const fieldColor = '#16a34a'; // Darker green (green-600)
@@ -424,7 +424,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
       {/* Context Menu for Player Replacement */}
       {contextMenu.visible && (
         <div
-          className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50 max-h-60 overflow-hidden"
+          className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-50 h-[350px] overflow-hidden"
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
@@ -441,7 +441,7 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
                 onClick={handleRemovePlayer}
                 className="w-full flex items-center justify-center px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
               >
-                🗑️ Spieler entfernen
+                Spieler entfernen
               </button>
             </div>
           )}
@@ -457,8 +457,8 @@ const SoccerField: React.FC<SoccerFieldProps> = ({ width, height }) => {
               autoFocus
             />
           </div>
-          
-          <div className="max-h-40 overflow-y-auto space-y-1">
+
+          <div className="max-h-[250px] overflow-y-auto space-y-1">
             {getAvailablePlayers(searchTerm).map((imageName) => (
               <button
                 key={imageName}

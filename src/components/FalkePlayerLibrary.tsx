@@ -34,10 +34,10 @@ const FalkePlayerLibrary: React.FC = () => {
     'Marcel.png',
     'Micha.png',
     'Mika.png',
-    'Rogg.png',
+    'Niclas.png',
     'Lukas.png',
     'Stefan.png',
-    'Theke.png',
+    'Nicholas.png',
   ];
 
   const getPlayerNameFromImage = (imageName: string) => {
